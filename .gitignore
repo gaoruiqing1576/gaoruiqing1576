@@ -1,4 +1,20 @@
-# Visual Studio 2015 user specific files
-.vs/
+# vuepress
+gb-pages/
+assets/
+docs/.vuepress/dist/
+/.fastRequest/
 
-*.mp4
+# vscode
+.vscode/
+
+# idea
+.idea/
+
+# npm
+package-lock.json
+node_modules
+node_modules/
+
+# yarn
+yarn.lock
+yarn-error.log

@@ -1,0 +1,50 @@
+name: Dependabot Auto Merge
+
+on:
+  pull_request:
+    types:
+      - labeled
+      - unlabeled
+      - synchronize
+      - opened
+      - edited
+      - ready_for_review
+      - reopened
+      - unlocked
+  pull_request_review:
+    types:
+      - submitted
+  check_suite:
+    types:
+      - completed
+  status: {}
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  automergejob:
+    name: Automerge PRs
+    runs-on: ubuntu-latest
+    if: ${{ github.actor == 'dependabot[bot]'  && !contains(github.event.pull_request.title, 'axios') }}
+    steps:
+      - name: Wait for status checks
+        id: waitforstatuschecks
+        uses: WyriHaximus/github-action-wait-for-status@v1.7.1
+        with:
+          ignoreActions: "Automerge PRs"
+          checkInterval: 60
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      - name: Auto merge
+        id: automerge
+        uses: pascalgn/automerge-action@v0.15.6
+        if: steps.waitforstatuschecks.outputs.status == 'success'
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          MERGE_LABELS: ""
+      - name: Feedback
+        id: feedback
+        run: |
+          echo "Pull request ${{ steps.automerge.outputs.pullRequestNumber }} ${{ steps.automerge.outputs.mergeResult }}!"
